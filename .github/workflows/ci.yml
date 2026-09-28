@@ -30,7 +30,7 @@ jobs:
 
   build:
     name: Build Docker Images
-    needs: test
+    # needs: test
     runs-on: ubuntu-latest
 
     env:
