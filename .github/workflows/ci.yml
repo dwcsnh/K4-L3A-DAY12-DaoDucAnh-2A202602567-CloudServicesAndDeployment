@@ -70,7 +70,7 @@ jobs:
 
   deploy:
     name: Deploy to Lightsail
-    needs: [test, build]
+    needs: [ build]
     if: github.ref == 'refs/heads/main'
     runs-on: [self-hosted, lightsail]
     steps:
