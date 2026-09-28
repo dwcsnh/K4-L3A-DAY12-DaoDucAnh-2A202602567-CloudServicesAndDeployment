@@ -76,13 +76,11 @@ jobs:
           echo "AGENT_API_KEY=${{ secrets.AGENT_API_KEY }}" > backend.env
           echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> backend.env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> backend.env
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> backend.env
           echo "ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}" >> backend.env
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> backend.env
           echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> backend.env
           
           echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" > frontend.env
-          echo "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}" >> frontend.env
 
           # Make env files available directly to deployment directory as well
           cp backend.env deployment/docker/backend.env
