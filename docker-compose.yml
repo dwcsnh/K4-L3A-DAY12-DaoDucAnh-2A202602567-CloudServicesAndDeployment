@@ -1,26 +1,4 @@
-# ═══════════════════════════════════════════════════════════════════
-# CP2 — Stack chạy ở máy bạn: agent + redis (+ nginx nếu làm phần cộng điểm)
-#
-# Service `redis` đã cho sẵn — chạy ngay từ Block 1 để có Redis mà code:
-#     docker compose up -d redis
-#
-# NHIỆM VỤ: bổ sung service `agent`. Yêu cầu:
-#   [ ] build từ Dockerfile trong thư mục hiện tại
-#   [ ] map cổng ra ngoài (8000:8000)
-#   [ ] KHÔNG viết secret thẳng vào file này — dùng nội suy biến môi trường
-#       `${AGENT_API_KEY}` (docker compose tự đọc từ file .env cùng thư mục)
-#   [ ] REDIS_URL trỏ tới `redis://redis:6379/0` — trong compose, tên service
-#       chính là hostname
-#   [ ] depends_on: redis
-#   [ ] healthcheck gọi /health
-#
-# MỞ RỘNG TÙY CHỌN: thêm service `nginx` làm load balancer
-# (không phải bonus chấm điểm riêng; nginx/nginx.conf đã có sẵn)
-#     docker compose up --scale agent=3
-#
-# Kiểm tra: pytest tests/test_cp2.py -v
-# ═══════════════════════════════════════════════════════════════════
-
+# Full RAG Chatbot Stack: agent, redis, mongo, frontend, nginx
 services:
   redis:
     image: redis:7-alpine
@@ -35,6 +13,13 @@ services:
       timeout: 3s
       retries: 5
 
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
   agent:
     build: .
     ports:
@@ -42,6 +27,7 @@ services:
     environment:
       AGENT_API_KEY: ${AGENT_API_KEY}
       REDIS_URL: redis://redis:6379/0
+      MONGODB_URI: mongodb://mongo:27017/rag_chatbot
     depends_on:
       redis:
         condition: service_healthy
@@ -51,5 +37,27 @@ services:
       timeout: 3s
       retries: 3
 
+  frontend:
+    build:
+      context: ./app/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://agent:8000
+    depends_on:
+      - agent
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - agent
+      - frontend
+
 volumes:
   redis-data:
+  mongo-data:
