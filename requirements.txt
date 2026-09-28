@@ -6,6 +6,14 @@ pydantic-settings>=2.2
 redis>=5.0
 python-dotenv>=1.0
 
+# RAG Chatbot Backend
+pymongo>=4.6
+pyjwt>=2.8
+bcrypt>=4.1
+python-multipart>=0.0.9
+pypdf>=4.0
+python-docx>=1.1
+
 # Test & checkpoint
 pytest>=8.0
 httpx>=0.27
